@@ -5,16 +5,15 @@ import AuroraDarkBg from "../assets/img/AuroraDarkBg.png";
 import AuroraWhiteBg from "../assets/img/AuroraWhiteBg.png";
 import { Link } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
-import { useState } from "react";
-import { useEffect } from "react";
-import { useRef } from "react";
+import { useState, useEffect, useRef } from "react";
 import { pdf } from "@react-pdf/renderer";
 import AuroraPDF from "../components/Aurora_PDF";
 // For Pdf Creation
 import html2canvas from "html2canvas";
 import jsPDF from "jspdf";
 
-const API_BASE_URL = "http://127.0.0.1:5000";
+const API_BASE_URL =
+  import.meta.env.VITE_API_BASE_URL || "https://aurora-backend-yblo.onrender.com";
 
 const WELCOME_MESSAGE = {
   sender: "bot",
@@ -27,6 +26,25 @@ function formatTime() {
   return new Date().toLocaleTimeString([], {
     hour: "2-digit",
     minute: "2-digit",
+  });
+}
+
+// Converts **text** into <strong>text</strong> cleanly without asterisks
+function renderFormattedText(text) {
+  if (!text) return "";
+
+  // Split on **bold content**
+  const parts = text.split(/(\*\*.*?\*\*)/g);
+
+  return parts.map((part, index) => {
+    if (part.startsWith("**") && part.endsWith("**")) {
+      return (
+        <strong key={index} style={{ fontWeight: 700 }}>
+          {part.slice(2, -2)}
+        </strong>
+      );
+    }
+    return part;
   });
 }
 
@@ -100,9 +118,6 @@ function Home() {
   const logoutPrecautionClick = () => {
     navigate("/login");
   };
-  // const deletePrecautionClick = () => {
-  //   navigate("/");
-  // };
   const profiletabClick = () => {
     setIsProfileClick(false);
   };
@@ -215,18 +230,6 @@ function Home() {
                 </Link>
               )}
             </div>
-            {/* <div className="menu" id="about_section">
-              <i className="fa-solid fa-circle-info"></i>
-              <Link to="./about" className="about-btn hide_text">
-                About Us
-              </Link>
-            </div>
-            <div className="menu" id="contact_section">
-              <i className="fa-regular fa-comment"></i>
-              <Link to="./contact" className="contact-btn hide_text">
-                Contact Us
-              </Link>
-            </div> */}
           </div>
           <div className="sidebar_footer">
             <div onClick={profileClick} className="user_info">
@@ -330,14 +333,18 @@ function Home() {
                 <div className="bot_message" key={index}>
                   <div className="message_content">
                     {msg.greeting && <h3>{msg.greeting}</h3>}
-                    <p style={{ whiteSpace: "pre-line" }}>{msg.text}</p>
+                    <p style={{ whiteSpace: "pre-line" }}>
+                      {renderFormattedText(msg.text)}
+                    </p>
                     {msg.time && <span className="msg_time">{msg.time}</span>}
                   </div>
                 </div>
               ) : (
                 <div className="user_message" key={index}>
                   <div className="message_content">
-                    <p>{msg.text}</p>
+                    <p style={{ whiteSpace: "pre-line" }}>
+                      {renderFormattedText(msg.text)}
+                    </p>
                     <span className="msg_time">{msg.time}</span>
                   </div>
                 </div>
