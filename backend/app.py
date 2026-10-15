@@ -1,3 +1,4 @@
+import os
 from flask import Flask
 from flask_cors import CORS
 
@@ -12,7 +13,7 @@ def create_app():
     app = Flask(__name__)
     app.config.from_object(Config)
 
-    # allow the Vite dev server (default port 5173) to call this API
+    # allow the Vite dev server (and production frontend) to call this API
     CORS(app, resources={r"/api/*": {"origins": "*"}})
 
     db.init_app(app)
@@ -33,4 +34,5 @@ app = create_app()
 if __name__ == "__main__":
     with app.app_context():
         db.create_all()  # creates tables if they don't exist yet
-    app.run(debug=True, port=5000)
+    port = int(os.environ.get("PORT", 5000))
+    app.run(host="0.0.0.0", port=port)
