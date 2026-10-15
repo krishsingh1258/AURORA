@@ -13,10 +13,20 @@ def create_app():
     app = Flask(__name__)
     app.config.from_object(Config)
 
-    # allow the Vite dev server (and production frontend) to call this API
-    CORS(app, resources={r"/api/*": {"origins": "*"}})
+    # Enable full CORS for frontend cross-origin requests
+    CORS(
+        app,
+        resources={r"/*": {"origins": "*"}},
+        supports_credentials=True,
+        allow_headers=["Content-Type", "Authorization"],
+        methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"]
+    )
 
     db.init_app(app)
+
+    # Ensure tables exist when running in production (Gunicorn)
+    with app.app_context():
+        db.create_all()
 
     app.register_blueprint(auth_bp)
     app.register_blueprint(chat_bp)
@@ -32,7 +42,5 @@ def create_app():
 app = create_app()
 
 if __name__ == "__main__":
-    with app.app_context():
-        db.create_all()  # creates tables if they don't exist yet
     port = int(os.environ.get("PORT", 5000))
     app.run(host="0.0.0.0", port=port)
