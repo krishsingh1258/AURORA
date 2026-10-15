@@ -24,10 +24,6 @@ def create_app():
 
     db.init_app(app)
 
-    # Ensure tables exist when running in production (Gunicorn)
-    with app.app_context():
-        db.create_all()
-
     app.register_blueprint(auth_bp)
     app.register_blueprint(chat_bp)
     app.register_blueprint(schemes_bp)
