@@ -28,9 +28,10 @@ def create_app():
     app.register_blueprint(chat_bp)
     app.register_blueprint(schemes_bp)
 
+    @app.route("/", methods=["GET"])
     @app.route("/api/health", methods=["GET"])
     def health():
-        return {"status": "ok"}, 200
+        return {"status": "Aurora backend is live and healthy"}, 200
 
     return app
 
@@ -40,3 +41,4 @@ app = create_app()
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
     app.run(host="0.0.0.0", port=port)
+
